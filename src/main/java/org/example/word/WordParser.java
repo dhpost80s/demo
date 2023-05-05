@@ -10,21 +10,52 @@ import java.util.List;
 public class WordParser {
 
     public static void main(String[] args) {
-        getQuestionsV2();
+        generateSQL();
     }
+
+    static int temp = 0;
 
     /**
      * Start with number and end with bracket
      */
-    private static void getQuestionsV2() {
+    private static List<Question> getQuestionsV2() {
+        List<Question> questions = new ArrayList<>();
         List<String> lines = getLines();
         int i = 1;
         for (String line : lines) {
             if (isStartNumberAndDot(line) && isEndBracket(line)) {
-                System.out.println(i + ": " + getText(line) + " ---- " + getPage(line));
+                if (getText(line).length() > temp) {
+                    temp = getText(line).length();
+                }
+
+                Question question = new Question();
+                question.setId(i);
+                question.setText(getText(line));
+                question.setPage(getPage(line));
+                questions.add(question);
+
+//                System.out.println(i + ": " + getText(line) + " ---- " + getPage(line));
                 i++;
             }
         }
+
+        return questions;
+    }
+
+    private static void generateSQL() {
+        List<Question> questions = getQuestionsV2();
+        for (Question question : questions) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("insert into question values (");
+            sb.append(question.getId());
+            sb.append(",'");
+            sb.append(question.getText());
+            sb.append("','");
+            sb.append(question.getPage());
+            sb.append("');");
+            System.out.println(sb.toString());
+        }
+
     }
 
     /**
